@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>STUV.ai Chatbot MVP</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="phone-frame" aria-label="WhatsApp style chatbot">
+        <header class="chat-header">
+          <div class="profile-pill">
+            <div class="avatar">S</div>
+            <div>
+              <h1>STUV.ai Assistant</h1>
+              <p>Online</p>
+            </div>
+          </div>
+        </header>
+
+        <section id="messages" class="messages" aria-live="polite"></section>
+
+        <footer class="composer">
+          <input id="messageInput" type="text" placeholder="Ask about STUV.ai, pricing, features..." />
+          <button id="sendButton" type="button">Send</button>
+        </footer>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
