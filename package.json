@@ -1,9 +1,15 @@
 {
   "name": "stuv-ai-chatbot-mvp",
   "version": "1.0.0",
-  "description": "A WhatsApp-style MVP chatbot for STUV.ai",
+  "description": "STUV.ai Chatbot MVP using Gemini API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
