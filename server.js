@@ -1,12 +1,16 @@
+
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config();
+require("dotenv").config({ path: path.join(__dirname, '.env') });
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, "public");
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+
+console.log("DEBUG - OPENROUTER_API_KEY:", OPENROUTER_API_KEY ? "Found" : "Not found");
+console.log("DEBUG - All env vars:", Object.keys(process.env).filter(k => k.includes("OPENROUTER")));
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -22,23 +26,22 @@ const MIME_TYPES = {
 const SYSTEM_PROMPT = `
 You are STUV.ai Assistant.
 
-Answer only questions related to STUV.ai.
+STUV.ai is an AI platform for furniture businesses that generates studio, catalog, lifestyle, and editorial visuals from a single product image in under 60 seconds.
 
-Topics:
-- Company
-- Product
-- Features
-- Pricing
-- Use cases
-- AI
-- Support
-- Demo
+Reference Information (use this for STUV.ai facts):
+- Problem Solved: Traditional product photography is slow (days/weeks), expensive ($500–$5,000/shoot). Stuv AI generates images in under 60 seconds per product for ₹15–₹300 per image.
+- 13 AI Features: AI Image Generation, Bulk Generation, AI Video Generation, AI Image Magic Suite, AI Upscaler, Object Replace, Fabric Match, Virtual Try-On, See In Your Room, AI Product Detailing, Shopify Push, AI Website Builder, Background Magic
+- Pricing: Images ₹15–₹300/image, Video ₹80–₹300/second, Descriptions ₹30/SKU, Try-On Standard ₹10,000/month, Try-On Whitelabel ₹30,000/month
+- Industries: Fashion & Apparel, Furniture & Home Decor, Real Estate (Virtual Staging), Jewelry & Luxury, Footwear, Electronics
+- Platform Statistics: 10M+ images generated, 1M+ videos created, 50,000+ registered users, 99.2% accuracy
+- Technology: Custom Latent Diffusion Models, ControlNet, Stable Video Diffusion, Real-ESRGAN, Multi-Modal LLM
+
+IMPORTANT: When answering about STUV.ai, base your answers on the reference information above. Do NOT make up facts about STUV.ai that are not in the reference. However, you can use your general knowledge to explain concepts, provide examples, and make answers conversational and helpful.
 
 If the user asks unrelated questions politely say:
-
 "I am designed to answer only STUV.ai related questions."
 
-Keep answers short and professional.
+Keep answers helpful and professional.
 `;
 
 async function readBody(req) {
@@ -78,23 +81,19 @@ async function askAI(message) {
 },
 
             body: JSON.stringify({
-
                 model: "openrouter/free",
-
                 messages: [
-
                     {
                         role: "system",
-                        content: "You are an assistant for STUV.ai. Answer only STUV.ai related questions."
+                        content: SYSTEM_PROMPT
                     },
-
                     {
                         role: "user",
                         content: message
                     }
-
-                ]
-
+                ],
+                max_tokens: 500,
+                temperature: 0.7
             })
 
         }

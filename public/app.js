@@ -56,7 +56,16 @@ const data=await res.json();
 
 typing.style.display="none";
 
-addMessage(data.reply,"bot");
+// Filter out safety messages and other metadata
+let reply = data.reply;
+if (reply.includes("User Safety:")) {
+  reply = reply.replace(/User Safety:.*?\n?/g, "").trim();
+}
+if (reply.includes("Safety:")) {
+  reply = reply.replace(/Safety:.*?\n?/g, "").trim();
+}
+
+addMessage(reply,"bot");
 
 }
 
