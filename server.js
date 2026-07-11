@@ -66,7 +66,7 @@ function sendJSON(res, status, data) {
   res.end(JSON.stringify(data));
 }
 
-async function askAI(message) {
+async function askAI(message, history) {
 
     const response = await fetch(
         "https://openrouter.ai/api/v1/chat/completions",
@@ -87,12 +87,13 @@ async function askAI(message) {
                         role: "system",
                         content: SYSTEM_PROMPT
                     },
+                    ...(history || []),
                     {
                         role: "user",
                         content: message
                     }
                 ],
-                max_tokens: 500,
+                max_tokens: 800,
                 temperature: 0.7
             })
 
@@ -126,7 +127,7 @@ const server = http.createServer(async (req, res) => {
 
             const body = await readBody(req);
 
-            const { message } = JSON.parse(body);
+            const { message, history } = JSON.parse(body);
 
             if (!message) {
 
@@ -144,7 +145,7 @@ const server = http.createServer(async (req, res) => {
 
             }
 
-            const reply = await askAI(message);
+            const reply = await askAI(message, history);
 
             return sendJSON(res, 200, {
                 reply

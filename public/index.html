@@ -20,12 +20,25 @@
             <h2>STUV.ai Assistant</h2>
             <span>Online</span>
         </div>
+
+        <div class="header-buttons">
+            <button id="themeToggle" class="icon-button" title="Toggle Theme">🌙</button>
+            <button id="exportChat" class="icon-button" title="Export Chat">📥</button>
+            <button id="clearChat" class="icon-button" title="Clear Chat">🗑️</button>
+        </div>
     </header>
 
     <div id="messages" class="messages"></div>
 
     <div class="typing" id="typing">
-        Assistant is typing...
+        <span class="typing-dots"></span>
+        <button id="stopButton" class="stop-button">Stop</button>
+    </div>
+
+    <div class="quick-questions" id="quickQuestions">
+        <button class="quick-btn" data-question="What is STUV.ai?">What is STUV.ai?</button>
+        <button class="quick-btn" data-question="What are the pricing plans?">Pricing</button>
+        <button class="quick-btn" data-question="What features does STUV.ai offer?">Features</button>
     </div>
 
     <div class="input-area">
