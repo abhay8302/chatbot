@@ -41,6 +41,70 @@ try {
     SYSTEM_PROMPT = "You are a helpful assistant.";
 }
 
+// Document retrieval system
+const docsPath = path.join(__dirname, "docs");
+const documents = {};
+
+// Load all documentation files
+function loadDocuments() {
+    const fs = require("fs");
+    try {
+        if (!fs.existsSync(docsPath)) {
+            console.log("Docs directory not found");
+            return;
+        }
+
+        const files = fs.readdirSync(docsPath);
+        files.forEach(file => {
+            if (file.endsWith('.md')) {
+                const filePath = path.join(docsPath, file);
+                const content = fs.readFileSync(filePath, 'utf-8');
+                const docName = file.replace('.md', '');
+                documents[docName] = content;
+                console.log(`Loaded document: ${docName}`);
+            }
+        });
+    } catch (error) {
+        console.error("Error loading documents:", error);
+    }
+}
+
+// Load documents on startup
+loadDocuments();
+
+// Keyword mapping for document retrieval
+const keywordMap = {
+    'about': ['about', 'what is', 'company', 'overview', 'introduction'],
+    'features': ['feature', 'functionality', 'capability', 'what can', 'tools', 'suite'],
+    'pricing': ['price', 'cost', 'pricing', 'how much', 'plan', 'subscription', 'fee'],
+    'industries': ['industry', 'sector', 'business', 'market', 'who uses', 'customers'],
+    'technology': ['technology', 'tech', 'stack', 'ai model', 'how does it work', 'algorithm'],
+    'customers': ['customer', 'user', 'client', 'who uses', 'case study']
+};
+
+// Retrieve relevant documents based on query
+function retrieveDocuments(query) {
+    const queryLower = query.toLowerCase();
+    const relevantDocs = [];
+
+    for (const [docName, keywords] of Object.entries(keywordMap)) {
+        if (keywords.some(keyword => queryLower.includes(keyword))) {
+            if (documents[docName]) {
+                relevantDocs.push(documents[docName]);
+            }
+        }
+    }
+
+    // If no specific match, return all documents as fallback
+    if (relevantDocs.length === 0) {
+        console.log("No specific document match, returning all documents");
+        return Object.values(documents);
+    }
+
+    console.log(`Retrieved ${relevantDocs.length} relevant documents`);
+    return relevantDocs;
+}
+
 async function readBody(req) {
   return new Promise((resolve, reject) => {
     let body = "";
@@ -65,6 +129,10 @@ function sendJSON(res, status, data) {
 
 async function askAI(message, history) {
 
+    // Retrieve relevant documents based on the query
+    const relevantDocs = retrieveDocuments(message);
+    const context = relevantDocs.join("\n\n---\n\n");
+
     const response = await fetch(
         "https://openrouter.ai/api/v1/chat/completions",
         {
@@ -82,7 +150,7 @@ async function askAI(message, history) {
                 messages: [
                     {
                         role: "system",
-                        content: SYSTEM_PROMPT
+                        content: `${SYSTEM_PROMPT}\n\nReference Documentation:\n${context}`
                     },
                     ...(history || []),
                     {
